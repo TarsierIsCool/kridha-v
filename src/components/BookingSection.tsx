@@ -20,6 +20,12 @@ type Booking = {
   course: string; message: string; createdAt: string;
 };
 
+function isValidPhone(phone: string): boolean {
+  // Accepts: 10-digit Indian numbers, with optional +91 or 0 prefix
+  const cleaned = phone.replace(/[\s\-()]/g, "");
+  return /^(\+91|91|0)?[6-9]\d{9}$/.test(cleaned);
+}
+
 async function saveBooking(b: Booking, uid: string | null) {
   const key = "kridha_bookings";
   const list = JSON.parse(localStorage.getItem(key) || "[]") as Booking[];
@@ -41,16 +47,30 @@ export function BookingSection() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "", phone: "", email: "", course: COURSES[1], message: "",
   });
 
   function update<K extends keyof typeof form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+    if (k === "phone") {
+      if (v && !isValidPhone(v)) {
+        setPhoneError("Please enter a valid 10-digit mobile number");
+      } else {
+        setPhoneError(null);
+      }
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!isValidPhone(form.phone)) {
+      setPhoneError("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -127,10 +147,24 @@ export function BookingSection() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <h3 className="text-xl font-bold">Reserve your seat</h3>
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Full name"><input required value={form.name} onChange={(e) => update("name", e.target.value)} className="input" /></Field>
-                <Field label="Phone"><input required value={form.phone} onChange={(e) => update("phone", e.target.value)} className="input" inputMode="tel" /></Field>
+                <Field label="Full name">
+                  <input required value={form.name} onChange={(e) => update("name", e.target.value)} className="input" />
+                </Field>
+                <Field label="Phone">
+                  <input
+                    required
+                    value={form.phone}
+                    onChange={(e) => update("phone", e.target.value)}
+                    className={`input ${phoneError ? "input-error" : ""}`}
+                    inputMode="tel"
+                    placeholder="e.g. 9876543210"
+                  />
+                  {phoneError && <p className="mt-1 text-xs text-red-500">{phoneError}</p>}
+                </Field>
               </div>
-              <Field label="Email"><input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="input" /></Field>
+              <Field label="Email">
+                <input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="input" />
+              </Field>
               <Field label="Course">
                 <select value={form.course} onChange={(e) => update("course", e.target.value)} className="input">
                   {COURSES.map((c) => <option key={c}>{c}</option>)}
@@ -141,7 +175,7 @@ export function BookingSection() {
               </Field>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !!phoneError}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-red text-destructive-foreground py-3 font-bold hover:opacity-90 transition disabled:opacity-60"
               >
                 <Send className="h-4 w-4" />
@@ -165,6 +199,7 @@ export function BookingSection() {
           transition: border-color .15s, box-shadow .15s;
         }
         .input:focus { border-color: var(--ring); box-shadow: 0 0 0 3px oklch(0.55 0.15 260 / 0.15); }
+        .input-error { border-color: #ef4444 !important; }
       `}</style>
     </section>
   );
