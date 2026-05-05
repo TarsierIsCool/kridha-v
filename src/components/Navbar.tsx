@@ -6,8 +6,8 @@ import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-provider";
 
 const links = [
-  { href: "#courses", label: "Courses" },
   { href: "#features", label: "Why Us" },
+  { href: "#courses", label: "Courses" },
   { href: "#pricing", label: "Pricing" },
   { href: "#book", label: "Book Demo" },
 ];
