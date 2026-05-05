@@ -9,7 +9,7 @@ type Course = {
   accent: "navy" | "blue" | "green" | "orange" | "red" | "violet";
   icon: React.ElementType;
   recommended?: boolean;
-};
+};  
 
 const courses: Course[] = [
   { n: 1, title: "Foundation", subtitle: "Perfect for beginners", icon: Code, accent: "violet",
@@ -33,7 +33,7 @@ const courses: Course[] = [
 ];
 
 const accentMap: Record<Course["accent"], { chip: string; outcome: string; icon: string }> = {
-  navy:   { chip: "bg-brand-navy text-primary-foreground", outcome: "bg-brand-navy text-primary-foreground", icon: "bg-brand-navy text-primary-foreground" },
+  navy:   { chip: "bg-indigo-700 text-white", outcome: "bg-indigo-700 text-white", icon: "bg-indigo-700 text-white" },
   blue:   { chip: "bg-blue-600 text-white",       outcome: "bg-blue-600 text-white",       icon: "bg-blue-600 text-white" },
   green:  { chip: "bg-emerald-600 text-white",    outcome: "bg-emerald-600 text-white",    icon: "bg-emerald-600 text-white" },
   orange: { chip: "bg-orange-500 text-white",     outcome: "bg-orange-500 text-white",     icon: "bg-orange-500 text-white" },
