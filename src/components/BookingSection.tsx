@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import emailjs from "@emailjs/browser";
 
 const EMAILJS_SERVICE_ID = "service_qizgg5a";
-const EMAILJS_TEMPLATE_ID = "template_1aqsg2c";
+const EMAILJS_TEMPLATE_ID = "template_hwby1n4";
 const EMAILJS_PUBLIC_KEY = "Zapj2_VnHxpPdKmsB";
 
 const COURSES = [
