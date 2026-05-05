@@ -86,9 +86,9 @@ export function Courses() {
                     </ul>
                   </div>
                 </div>
-                <Link to="/courses" className={`px-6 py-3 text-center font-bold block ${a.outcome}`}>
-                  View Course Details
-                 </Link>
+                <a href="/courses" className={`px-6 py-3 text-center font-bold block ${a.outcome}`}>
+  View Course Details
+</a>
               </div>
             );
           })}
