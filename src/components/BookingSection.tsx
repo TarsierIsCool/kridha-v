@@ -33,7 +33,7 @@ async function checkDuplicate(phone: string, email: string): Promise<boolean> {
     if (!byEmail.empty) return true;
     return false;
   } catch {
-    return false; // If check fails, allow booking
+    return false;
   }
 }
 
@@ -81,7 +81,6 @@ export function BookingSection() {
     setLoading(true);
     setError(null);
 
-    // Check for duplicate
     if (!force) {
       const isDuplicate = await checkDuplicate(form.phone, form.email);
       if (isDuplicate) {
@@ -122,15 +121,17 @@ export function BookingSection() {
           <span className="inline-flex items-center gap-2 rounded-full bg-brand-yellow text-foreground px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider">
             <Calendar className="h-3.5 w-3.5" /> Book Your Free Demo Class
           </span>
-          <h2 className="mt-5 text-4xl lg:text-5xl font-extrabold leading-tight">
+          <h2 className="mt-5 text-4xl lg:text-5xl font-extrabold leading-tight text-white">
             Try a class. <span className="text-brand-yellow">Then decide.</span>
           </h2>
-          <p className="mt-4 text-foreground/80 max-w-md">
+          <p className="mt-4 text-white/80 max-w-md">
             No commitment. Sit through a real session, talk to the mentor, and see how we teach. We'll confirm your slot shortly.
           </p>
-          <ul className="mt-6 space-y-2 text-sm">
+          <ul className="mt-6 space-y-2 text-sm text-white">
             {["Free 1-hour live demo", "1:1 career counselling", "EMI options explained"].map((x) => (
-              <li key={x} className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-brand-yellow" /> {x}</li>
+              <li key={x} className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-brand-yellow" /> {x}
+              </li>
             ))}
           </ul>
         </div>
@@ -157,7 +158,6 @@ export function BookingSection() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <h3 className="text-xl font-bold">Reserve your seat</h3>
 
-              {/* Duplicate warning */}
               {duplicate && (
                 <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 flex gap-3">
                   <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
@@ -205,7 +205,7 @@ export function BookingSection() {
               <button
                 type="submit"
                 disabled={loading || !!phoneError}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-red text-destructive-foreground py-3 font-bold hover:opacity-90 transition disabled:opacity-60"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-red text-white py-3 font-bold hover:opacity-90 transition disabled:opacity-60"
               >
                 <Send className="h-4 w-4" />
                 {loading ? "Checking..." : "Book My Free Demo"}
@@ -237,7 +237,7 @@ export function BookingSection() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{label}</span>
+      <span className="block text-xs font-semibold uppercase tracking-wider text-white/60 mb-1.5">{label}</span>
       {children}
     </label>
   );
