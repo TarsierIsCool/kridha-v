@@ -1,4 +1,5 @@
 import { Code, Layers, BrainCircuit, Cloud, ShieldCheck, Rocket } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 type Course = {
   n: number;
@@ -85,9 +86,9 @@ export function Courses() {
                     </ul>
                   </div>
                 </div>
-                <div className={`px-6 py-3 text-center font-bold ${a.outcome}`}>
-                  {c.outcome}
-                </div>
+                <Link to="/courses" className={`px-6 py-3 text-center font-bold block ${a.outcome}`}>
+                  View Course Details
+                 </Link>
               </div>
             );
           })}
