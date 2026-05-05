@@ -1,9 +1,14 @@
 import { useState } from "react";
-import { site, waLink, mailLink } from "@/lib/site";
+import { site } from "@/lib/site";
 import { Calendar, Send, CheckCircle2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useAuth } from "@/lib/auth-context";
+import emailjs from "@emailjs/browser";
+
+const EMAILJS_SERVICE_ID = "service_qizgg5a";
+const EMAILJS_TEMPLATE_ID = "template_1aqsg2c";
+const EMAILJS_PUBLIC_KEY = "Zapj2_VnHxpPdKmsB";
 
 const COURSES = [
   "Foundation", "Full Stack Developer", "AI & Data Science",
@@ -16,12 +21,10 @@ type Booking = {
 };
 
 async function saveBooking(b: Booking, uid: string | null) {
-  // Always keep a local copy as a fallback.
   const key = "kridha_bookings";
   const list = JSON.parse(localStorage.getItem(key) || "[]") as Booking[];
   list.push(b);
   localStorage.setItem(key, JSON.stringify(list));
-  // Save to Firestore.
   try {
     await addDoc(collection(db, "bookings"), {
       ...b,
@@ -36,6 +39,8 @@ async function saveBooking(b: Booking, uid: string | null) {
 export function BookingSection() {
   const { user } = useAuth();
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "", phone: "", email: "", course: COURSES[1], preferredTime: "", message: "",
   });
@@ -46,19 +51,39 @@ export function BookingSection() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+
     const booking: Booking = {
       id: crypto.randomUUID(), ...form, createdAt: new Date().toISOString(),
     };
+
+    // Save to Firestore
     await saveBooking(booking, user?.uid ?? null);
-    const text = `Hi ${site.name}! I'd like to book a free demo class.
-Name: ${form.name}
-Phone: ${form.phone}
-Email: ${form.email}
-Course: ${form.course}
-Preferred time: ${form.preferredTime}
-Notes: ${form.message}`;
-    window.open(waLink(text), "_blank");
-    setSent(true);
+
+    // Send email via EmailJS
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          phone: form.phone,
+          course: form.course,
+          preferred_time: form.preferredTime,
+          message: form.message || "No additional notes.",
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+      setSent(true);
+    } catch (err) {
+      console.error("Email failed:", err);
+      setError("Booking saved but email notification failed. We'll still be in touch!");
+      setSent(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -72,7 +97,7 @@ Notes: ${form.message}`;
             Try a class. <span className="text-brand-yellow">Then decide.</span>
           </h2>
           <p className="mt-4 text-primary-foreground/80 max-w-md">
-            No commitment. Sit through a real session, talk to the mentor, and see how we teach. We'll confirm your slot on WhatsApp.
+            No commitment. Sit through a real session, talk to the mentor, and see how we teach. We'll confirm your slot shortly.
           </p>
           <ul className="mt-6 space-y-2 text-sm">
             {["Free 1-hour live demo", "1:1 career counselling", "EMI options explained"].map((x) => (
@@ -88,10 +113,17 @@ Notes: ${form.message}`;
                 <CheckCircle2 className="h-7 w-7" />
               </div>
               <h3 className="mt-4 text-2xl font-bold">You're in!</h3>
-              <p className="mt-2 text-muted-foreground">We've opened WhatsApp to confirm your slot. If it didn't open, message us directly.</p>
+              <p className="mt-2 text-muted-foreground">
+                Your booking has been received. We'll reach out to confirm your demo slot soon!
+              </p>
+              {error && <p className="mt-2 text-xs text-amber-500">{error}</p>}
               <div className="mt-5 flex flex-wrap justify-center gap-3">
-                <a href={waLink("Hi, I just booked a demo class.")} target="_blank" rel="noreferrer" className="rounded-full bg-brand-red text-destructive-foreground px-5 py-2 font-semibold">Open WhatsApp</a>
-                <button onClick={() => setSent(false)} className="rounded-full border border-border px-5 py-2 font-semibold">Book another</button>
+                <button
+                  onClick={() => { setSent(false); setForm({ name: "", phone: "", email: "", course: COURSES[1], preferredTime: "", message: "" }); }}
+                  className="rounded-full border border-border px-5 py-2 font-semibold"
+                >
+                  Book another
+                </button>
               </div>
             </div>
           ) : (
@@ -113,11 +145,13 @@ Notes: ${form.message}`;
               <Field label="Anything we should know? (optional)">
                 <textarea value={form.message} onChange={(e) => update("message", e.target.value)} className="input min-h-[80px]" />
               </Field>
-              <button type="submit" className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-red text-destructive-foreground py-3 font-bold hover:opacity-90 transition">
-                <Send className="h-4 w-4" /> Confirm via WhatsApp
-              </button>
-              <button type="button" onClick={() => window.open(mailLink("Demo class booking", `Name: ${form.name}\nPhone: ${form.phone}\nCourse: ${form.course}`))} className="w-full text-sm text-muted-foreground hover:text-foreground">
-                or email us instead
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-red text-destructive-foreground py-3 font-bold hover:opacity-90 transition disabled:opacity-60"
+              >
+                <Send className="h-4 w-4" />
+                {loading ? "Sending..." : "Book My Free Demo"}
               </button>
             </form>
           )}
