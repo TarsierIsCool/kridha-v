@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { site } from "@/lib/site";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-provider";
 
 const links = [
   { href: "#courses", label: "Courses" },
@@ -14,6 +15,8 @@ const links = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { theme, toggle } = useTheme();
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="mx-auto max-w-7xl px-5 lg:px-8 h-16 flex items-center justify-between">
@@ -24,6 +27,7 @@ export function Navbar() {
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{site.tagline}</div>
           </div>
         </Link>
+
         <nav className="hidden md:flex items-center gap-8">
           {links.map((l) => (
             <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition">
@@ -40,11 +44,31 @@ export function Navbar() {
           ) : (
             <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground">Sign in</Link>
           )}
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggle}
+            aria-label="Toggle dark mode"
+            className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
         </nav>
-        <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
-          {open ? <X /> : <Menu />}
-        </button>
+
+        <div className="flex items-center gap-2 md:hidden">
+          {/* Dark mode toggle mobile */}
+          <button
+            onClick={toggle}
+            aria-label="Toggle dark mode"
+            className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-muted-foreground"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button onClick={() => setOpen(!open)} aria-label="Menu">
+            {open ? <X /> : <Menu />}
+          </button>
+        </div>
       </div>
+
       {open && (
         <div className="md:hidden border-t border-border bg-background">
           <div className="px-5 py-4 flex flex-col gap-4">
