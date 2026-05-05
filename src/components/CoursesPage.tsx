@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Code, Layers, BrainCircuit, Cloud, ShieldCheck, Rocket, X, ArrowRight, ChevronDown } from "lucide-react";
+import { Code, Layers, BrainCircuit, Cloud, ShieldCheck, Rocket, X, ArrowRight } from "lucide-react";
 
 const courses = [
   {
@@ -18,7 +18,7 @@ const courses = [
       { module: "Module 2", topic: "Java Basics", weeks: "2 weeks" },
       { module: "Module 3", topic: "Data Structures & Algorithms", weeks: "4 weeks" },
       { module: "Module 4", topic: "Git & Version Control", weeks: "2 weeks" },
-    ],
+									 							],
     projects: ["CLI Task Manager", "Student Grade Calculator", "Mini Bank System"],
     mentor: { name: "Ravi Kumar", exp: "8 years", company: "Ex-TCS, Infosys", img: "RK" },
     outcomes: ["Strong programming foundation", "Ready for advanced tracks", "Industry certification"],
@@ -135,6 +135,7 @@ const courses = [
 
 export function CoursesPage() {
   const [active, setActive] = useState<string | null>(null);
+  const activeCourse = courses.find((c) => c.slug === active);
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,124 +145,146 @@ export function CoursesPage() {
         <p className="mt-3 text-white/70 text-lg">Click a track to explore the full details</p>
       </div>
 
-      {/* Accordion rows */}
-      <div className="divide-y divide-white/10">
+      {/* Columns */}
+      <div className="flex h-[600px] overflow-hidden">
         {courses.map((c) => {
           const isActive = active === c.slug;
           const Icon = c.icon;
           return (
-            <div key={c.slug} className="overflow-hidden">
-              {/* Row header - always visible */}
-              <button
-                onClick={() => setActive(isActive ? null : c.slug)}
-                className="w-full flex items-center justify-between px-6 py-5 text-left transition-all duration-300"
-                style={{ backgroundColor: c.color }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-xl bg-white/20 grid place-items-center shrink-0">
-                    <Icon className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-white font-extrabold text-lg">{c.title}</div>
-                    <div className="text-white/70 text-sm">{c.subtitle}</div>
-                  </div>
+            <div
+              key={c.slug}
+              onClick={() => setActive(isActive ? null : c.slug)}
+              className="relative cursor-pointer overflow-hidden transition-all duration-500 ease-in-out flex flex-col"
+              style={{
+                flex: isActive ? "5" : "1",
+                backgroundColor: c.color,
+                minWidth: isActive ? "0" : "48px",
+              }}
+            >
+              {/* Collapsed label */}
+              {!isActive && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  <Icon className="h-6 w-6 text-white/90 shrink-0" />
+                  <span
+                    className="text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap"
+                    style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+                  >
+                    {c.title}
+                  </span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex gap-3">
-                    <span className="rounded-full bg-white/20 text-white text-xs font-semibold px-3 py-1">{c.duration}</span>
-                    <span className="rounded-full bg-white/20 text-white text-xs font-semibold px-3 py-1">{c.fee}</span>
-                    <span className="rounded-full bg-white/30 text-white text-xs font-bold px-3 py-1">⚡ {c.seats}</span>
-                  </div>
-                  <ChevronDown
-                    className="h-5 w-5 text-white transition-transform duration-300"
-                    style={{ transform: isActive ? "rotate(180deg)" : "rotate(0deg)" }}
-                  />
-                </div>
-              </button>
+              )}
 
               {/* Expanded content */}
-              <div
-                className="overflow-hidden transition-all duration-500"
-                style={{ maxHeight: isActive ? "1000px" : "0px" }}
-              >
-                <div className="bg-background p-6 lg:p-8">
-                  {/* Mobile stats */}
-                  <div className="flex sm:hidden gap-2 mb-5 flex-wrap">
-                    <span className="rounded-full text-white text-xs font-semibold px-3 py-1" style={{ backgroundColor: c.color }}>{c.duration}</span>
-                    <span className="rounded-full text-white text-xs font-semibold px-3 py-1" style={{ backgroundColor: c.color }}>{c.fee}</span>
-                    <span className="rounded-full text-white text-xs font-bold px-3 py-1" style={{ backgroundColor: c.color }}>⚡ {c.seats}</span>
-                  </div>
+              {isActive && (
+                <div className="flex h-full overflow-hidden">
+                  {/* Left accent */}
+                  <div className="w-2 shrink-0" style={{ backgroundColor: c.color }} />
 
-                  <div className="grid lg:grid-cols-3 gap-8">
-                    {/* Syllabus */}
-                    <div>
-                      <h3 className="font-bold text-sm uppercase tracking-wider mb-3" style={{ color: c.color }}>Syllabus</h3>
-                      <div className="space-y-2">
-                        {c.syllabus.map((s) => (
-                          <div key={s.module} className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm">
-                            <div>
-                              <span className="font-semibold">{s.module}</span>
-                              <span className="text-muted-foreground"> · {s.topic}</span>
+                  {/* Content */}
+                  <div className="flex-1 bg-background overflow-y-auto p-6 lg:p-8">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-12 w-12 rounded-xl grid place-items-center" style={{ backgroundColor: c.color }}>
+                          <Icon className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-extrabold">{c.title}</h2>
+                          <p className="text-muted-foreground text-sm">{c.subtitle}</p>
+                        </div>
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); setActive(null); }} className="rounded-full p-1.5 hover:bg-muted transition">
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="mt-5 grid grid-cols-3 gap-3">
+                      {[
+                        { label: "Duration", value: c.duration },
+                        { label: "Fee", value: c.fee },
+                        { label: "Next Batch", value: c.batch },
+                      ].map((s) => (
+                        <div key={s.label} className="rounded-xl p-3 text-center" style={{ backgroundColor: c.lightColor }}>
+                          <div className="text-xs text-gray-500 uppercase tracking-wider">{s.label}</div>
+                          <div className="mt-1 font-bold text-sm text-gray-800">{s.value}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-1 text-xs font-semibold text-center" style={{ color: c.color }}>
+                      ⚡ {c.seats}
+                    </div>
+
+                    <div className="mt-5 grid lg:grid-cols-2 gap-6">
+                      {/* Syllabus */}
+                      <div>
+                        <h3 className="font-bold text-sm uppercase tracking-wider mb-3">Syllabus</h3>
+                        <div className="space-y-2">
+                          {c.syllabus.map((s) => (
+                            <div key={s.module} className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm">
+                              <div>
+                                <span className="font-semibold">{s.module}</span>
+                                <span className="text-muted-foreground"> · {s.topic}</span>
+                              </div>
+                              <span className="text-xs text-muted-foreground shrink-0 ml-2">{s.weeks}</span>
                             </div>
-                            <span className="text-xs text-muted-foreground shrink-0 ml-2">{s.weeks}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Projects + Mentor */}
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="font-bold text-sm uppercase tracking-wider mb-3" style={{ color: c.color }}>Projects You'll Build</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {c.projects.map((p) => (
-                            <span key={p} className="rounded-full px-3 py-1 text-xs font-semibold text-white" style={{ backgroundColor: c.color }}>
-                              {p}
-                            </span>
                           ))}
                         </div>
                       </div>
-                      <div>
-                        <h3 className="font-bold text-sm uppercase tracking-wider mb-3" style={{ color: c.color }}>Your Mentor</h3>
-                        <div className="flex items-center gap-3 rounded-xl border border-border p-3">
-                          <div className="h-12 w-12 rounded-full grid place-items-center font-bold text-white text-sm shrink-0" style={{ backgroundColor: c.color }}>
-                            {c.mentor.img}
+
+                      <div className="space-y-5">
+                        {/* Projects */}
+                        <div>
+                          <h3 className="font-bold text-sm uppercase tracking-wider mb-3">Projects You'll Build</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {c.projects.map((p) => (
+                              <span key={p} className="rounded-full px-3 py-1 text-xs font-semibold text-white" style={{ backgroundColor: c.color }}>
+                                {p}
+                              </span>
+                            ))}
                           </div>
-                          <div>
-                            <div className="font-bold">{c.mentor.name}</div>
-                            <div className="text-xs text-muted-foreground">{c.mentor.exp} · {c.mentor.company}</div>
+                        </div>
+
+                        {/* Mentor */}
+                        <div>
+                          <h3 className="font-bold text-sm uppercase tracking-wider mb-3">Your Mentor</h3>
+                          <div className="flex items-center gap-3 rounded-xl border border-border p-3">
+                            <div className="h-12 w-12 rounded-full grid place-items-center font-bold text-white text-sm shrink-0" style={{ backgroundColor: c.color }}>
+                              {c.mentor.img}
+                            </div>
+                            <div>
+                              <div className="font-bold">{c.mentor.name}</div>
+                              <div className="text-xs text-muted-foreground">{c.mentor.exp} experience · {c.mentor.company}</div>
+                            </div>
                           </div>
+                        </div>
+
+                        {/* Outcomes */}
+                        <div>
+                          <h3 className="font-bold text-sm uppercase tracking-wider mb-3">What You'll Achieve</h3>
+                          <ul className="space-y-1.5">
+                            {c.outcomes.map((o) => (
+                              <li key={o} className="flex items-center gap-2 text-sm">
+                                <ArrowRight className="h-3.5 w-3.5 shrink-0" style={{ color: c.color }} />
+                                {o}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
                     </div>
 
-                    {/* Outcomes + CTA */}
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="font-bold text-sm uppercase tracking-wider mb-3" style={{ color: c.color }}>What You'll Achieve</h3>
-                        <ul className="space-y-2">
-                          {c.outcomes.map((o) => (
-                            <li key={o} className="flex items-center gap-2 text-sm">
-                              <ArrowRight className="h-3.5 w-3.5 shrink-0" style={{ color: c.color }} />
-                              {o}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-2">📅 {c.batch}</div>
-                        <a
-                          href="/#book"
-                          className="w-full inline-flex items-center justify-center gap-2 rounded-full py-3 font-bold text-white transition hover:opacity-90"
-                          style={{ backgroundColor: c.color }}
-                        >
-                          Book Free Demo <ArrowRight className="h-4 w-4" />
-                        </a>
-                      </div>
-                    </div>
+                    {/* CTA */}
+                    <a
+                      href="#book"
+                      className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-full py-3 font-bold text-white transition hover:opacity-90"
+                      style={{ backgroundColor: c.color }}
+                    >
+                      Book Free Demo for {c.title} <ArrowRight className="h-4 w-4" />
+                    </a>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           );
         })}
