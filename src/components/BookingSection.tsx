@@ -17,7 +17,7 @@ const COURSES = [
 
 type Booking = {
   id: string; name: string; phone: string; email: string;
-  course: string; preferredTime: string; message: string; createdAt: string;
+  course: string; message: string; createdAt: string;
 };
 
 async function saveBooking(b: Booking, uid: string | null) {
@@ -42,7 +42,7 @@ export function BookingSection() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
-    name: "", phone: "", email: "", course: COURSES[1], preferredTime: "", message: "",
+    name: "", phone: "", email: "", course: COURSES[1], message: "",
   });
 
   function update<K extends keyof typeof form>(k: K, v: string) {
@@ -58,10 +58,8 @@ export function BookingSection() {
       id: crypto.randomUUID(), ...form, createdAt: new Date().toISOString(),
     };
 
-    // Save to Firestore
     await saveBooking(booking, user?.uid ?? null);
 
-    // Send email via EmailJS
     try {
       await emailjs.send(
         EMAILJS_SERVICE_ID,
@@ -71,7 +69,6 @@ export function BookingSection() {
           from_email: form.email,
           phone: form.phone,
           course: form.course,
-          preferred_time: form.preferredTime,
           message: form.message || "No additional notes.",
         },
         EMAILJS_PUBLIC_KEY
@@ -119,7 +116,7 @@ export function BookingSection() {
               {error && <p className="mt-2 text-xs text-amber-500">{error}</p>}
               <div className="mt-5 flex flex-wrap justify-center gap-3">
                 <button
-                  onClick={() => { setSent(false); setForm({ name: "", phone: "", email: "", course: COURSES[1], preferredTime: "", message: "" }); }}
+                  onClick={() => { setSent(false); setForm({ name: "", phone: "", email: "", course: COURSES[1], message: "" }); }}
                   className="rounded-full border border-border px-5 py-2 font-semibold"
                 >
                   Book another
@@ -134,14 +131,11 @@ export function BookingSection() {
                 <Field label="Phone"><input required value={form.phone} onChange={(e) => update("phone", e.target.value)} className="input" inputMode="tel" /></Field>
               </div>
               <Field label="Email"><input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="input" /></Field>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Course">
-                  <select value={form.course} onChange={(e) => update("course", e.target.value)} className="input">
-                    {COURSES.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                </Field>
-                <Field label="Preferred time"><input value={form.preferredTime} onChange={(e) => update("preferredTime", e.target.value)} className="input" placeholder="e.g. Sat 11am" /></Field>
-              </div>
+              <Field label="Course">
+                <select value={form.course} onChange={(e) => update("course", e.target.value)} className="input">
+                  {COURSES.map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </Field>
               <Field label="Anything we should know? (optional)">
                 <textarea value={form.message} onChange={(e) => update("message", e.target.value)} className="input min-h-[80px]" />
               </Field>
