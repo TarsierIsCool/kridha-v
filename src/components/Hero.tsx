@@ -29,6 +29,22 @@ export function Hero() {
               Explore Courses
             </a>
           </div>
+
+          {/* Student count badge */}
+          <div className="mt-6 flex items-center gap-3">
+            <div className="flex -space-x-2">
+              {["🧑", "👩", "👨", "🧑", "👩"].map((emoji, i) => (
+                <div key={i} className="h-8 w-8 rounded-full border-2 border-white/20 bg-white/10 grid place-items-center text-sm">
+                  {emoji}
+                </div>
+              ))}
+            </div>
+            <div className="text-sm text-white/80">
+              <span className="font-bold text-white">500+</span> students trained ·{" "}
+              <span className="font-bold text-brand-yellow">4.9★</span> rating
+            </div>
+          </div>
+
         </div>
         <div className="relative animate-fade-up">
           <div className="relative aspect-square max-w-md mx-auto">
