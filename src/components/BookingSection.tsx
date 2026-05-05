@@ -116,7 +116,7 @@ export function BookingSection() {
   }
 
   return (
-    <section id="book" className="relative bg-hero-gradient text-primary-foreground py-20">
+    <section id="book" className="relative bg-hero-gradient py-20" style={{ colorScheme: "normal" }}>
       <div className="mx-auto max-w-6xl px-5 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full bg-brand-yellow text-foreground px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider">
