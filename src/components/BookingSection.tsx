@@ -125,7 +125,7 @@ export function BookingSection() {
           <h2 className="mt-5 text-4xl lg:text-5xl font-extrabold leading-tight">
             Try a class. <span className="text-brand-yellow">Then decide.</span>
           </h2>
-          <p className="mt-4 text-primary-foreground/80 max-w-md">
+          <p className="mt-4 text-foreground/80 max-w-md">
             No commitment. Sit through a real session, talk to the mentor, and see how we teach. We'll confirm your slot shortly.
           </p>
           <ul className="mt-6 space-y-2 text-sm">
